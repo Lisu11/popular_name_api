@@ -3,6 +3,7 @@ defmodule PopularNameApiWeb.PersonController do
 
   alias PopularNameApi.Citizens
   alias PopularNameApi.Citizens.Person
+
   alias PopularNameApiWeb.Schemas.{
     PeopleResponse,
     PersonParams,
@@ -16,7 +17,7 @@ defmodule PopularNameApiWeb.PersonController do
 
   tags ["persons"]
 
-   operation :generate,
+  operation :generate,
     summary: "Generate random people",
     parameters: [
       amount: [in: :query, type: :integer, description: "amount by default it is 100"]
@@ -25,6 +26,7 @@ defmodule PopularNameApiWeb.PersonController do
     responses: %{
       204 => {"Generation started", "application/json", EmptyResponse}
     }
+
   def generate(conn, params) do
     params
     |> Map.get("amount", 100)
@@ -39,6 +41,7 @@ defmodule PopularNameApiWeb.PersonController do
     responses: [
       ok: {"People response", "application/json", PeopleResponse}
     ]
+
   def index(conn, _params) do
     persons = Citizens.list_persons()
     render(conn, :index, persons: persons)
@@ -51,6 +54,7 @@ defmodule PopularNameApiWeb.PersonController do
       :ok => {"Person response", "application/json", PersonResponse},
       422 => {"Wrong input", "application/json", ErrorObjectResponse}
     }
+
   def create(conn, person_params) do
     with {:ok, %Person{} = person} <- Citizens.create_person(person_params) do
       conn
@@ -70,6 +74,7 @@ defmodule PopularNameApiWeb.PersonController do
       404 => {"Not found record for a given id", "application/json", ErrorStringResponse},
       400 => {"Wrong id input", "application/json", ErrorStringResponse}
     }
+
   def show(conn, %{"id" => id}) do
     with %Person{} = person <- validate_id_param(id) do
       render(conn, :show, person: person)
@@ -88,6 +93,7 @@ defmodule PopularNameApiWeb.PersonController do
       400 => {"Wrong id input", "application/json", ErrorStringResponse},
       422 => {"Unprocessable Content", "application/json", ErrorObjectResponse}
     }
+
   def update(conn, %{"id" => id} = person_params) do
     with %Person{} = person <- validate_id_param(id),
          {:ok, %Person{} = person} <- Citizens.update_person(person, person_params) do
@@ -105,6 +111,7 @@ defmodule PopularNameApiWeb.PersonController do
       404 => {"Not found record for a given id", "application/json", ErrorStringResponse},
       400 => {"Wrong id input", "application/json", ErrorStringResponse}
     }
+
   def delete(conn, %{"id" => id}) do
     with %Person{} = person <- validate_id_param(id),
          {:ok, %Person{}} <- Citizens.delete_person(person) do

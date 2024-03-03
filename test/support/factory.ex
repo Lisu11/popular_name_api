@@ -6,7 +6,7 @@ defmodule PopularNameApi.Factory do
       first_name: "Jane",
       last_name: "Smith",
       sex: :female,
-      birth_date: sequence(:birth_date, & Date.new!(1970, 1, 1) |> Date.add(&1))
+      birth_date: sequence(:birth_date, &(Date.new!(1970, 1, 1) |> Date.add(&1)))
     }
   end
 end

@@ -1,7 +1,6 @@
 defmodule PopularNameApiWeb.PersonControllerTest do
   use PopularNameApiWeb.ConnCase
 
-
   alias PopularNameApi.Citizens.Person
 
   @create_attrs %{
@@ -124,7 +123,7 @@ defmodule PopularNameApiWeb.PersonControllerTest do
       assert json_response(conn, 400)["error_details"] =~ "Bad Request"
     end
 
-     test "not found should be return for unknown id", %{conn: conn, person: person} do
+    test "not found should be return for unknown id", %{conn: conn, person: person} do
       conn = get(conn, ~p"/api/persons")
       assert json_response(conn, 200)["data"]
       [p] = json_response(conn, 200)["data"]
@@ -151,7 +150,6 @@ defmodule PopularNameApiWeb.PersonControllerTest do
       assert response(conn, 400)
       assert json_response(conn, 400)["error_details"] =~ "Bad Request"
     end
-
 
     test "not found should be return for unknown id", %{conn: conn, person: person} do
       conn = get(conn, ~p"/api/persons")

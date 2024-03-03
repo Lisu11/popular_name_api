@@ -5,11 +5,13 @@ defmodule PopularNameApi.Citizens.Person do
   schema "persons" do
     field :first_name, :string
     field :last_name, :string
+
     field :sex, Ecto.Enum,
       values: [
         :male,
         :female
       ]
+
     field :birth_date, :date
 
     timestamps(type: :utc_datetime)
@@ -22,7 +24,6 @@ defmodule PopularNameApi.Citizens.Person do
     |> validate_required([:first_name, :last_name, :sex, :birth_date])
     |> validate_inclusion(:sex, [:male, :female, "male", "female"])
     |> validate_birth_date()
-
   end
 
   defp validate_birth_date(changeset) do

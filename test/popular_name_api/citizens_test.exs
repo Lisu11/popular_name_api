@@ -6,9 +6,24 @@ defmodule PopularNameApi.CitizensTest do
   describe "persons" do
     alias PopularNameApi.Citizens.Person
 
-    @invalid_attrs_sex %{first_name: "Julia", last_name: "Smith", sex: :fluid, birth_date: ~D[1999-01-01]}
-    @invalid_attrs_birth %{first_name: "Julia", last_name: "Smith", sex: :female, birth_date: ~D[2024-01-01]}
-    @invalid_attrs_name %{first_name: "Julia", last_name: nil, sex: :female, birth_date: ~D[1999-01-01]}
+    @invalid_attrs_sex %{
+      first_name: "Julia",
+      last_name: "Smith",
+      sex: :fluid,
+      birth_date: ~D[1999-01-01]
+    }
+    @invalid_attrs_birth %{
+      first_name: "Julia",
+      last_name: "Smith",
+      sex: :female,
+      birth_date: ~D[2024-01-01]
+    }
+    @invalid_attrs_name %{
+      first_name: "Julia",
+      last_name: nil,
+      sex: :female,
+      birth_date: ~D[1999-01-01]
+    }
 
     test "list_persons/0 returns all persons" do
       person = insert(:person)
@@ -21,7 +36,12 @@ defmodule PopularNameApi.CitizensTest do
     end
 
     test "create_person/1 with valid data creates a person" do
-      valid_attrs = %{first_name: "Julia", last_name: "Smith", sex: :female, birth_date: ~D[1999-01-01]}
+      valid_attrs = %{
+        first_name: "Julia",
+        last_name: "Smith",
+        sex: :female,
+        birth_date: ~D[1999-01-01]
+      }
 
       assert {:ok, %Person{} = person} = Citizens.create_person(valid_attrs)
       assert person.first_name == "Julia"
@@ -44,7 +64,13 @@ defmodule PopularNameApi.CitizensTest do
 
     test "update_person/2 with valid data updates the person" do
       person = insert(:person)
-      update_attrs = %{first_name: "Julia", last_name: "Smith", sex: :female, birth_date: ~D[1999-01-01]}
+
+      update_attrs = %{
+        first_name: "Julia",
+        last_name: "Smith",
+        sex: :female,
+        birth_date: ~D[1999-01-01]
+      }
 
       assert {:ok, %Person{} = person} = Citizens.update_person(person, update_attrs)
       assert person.first_name == "Julia"

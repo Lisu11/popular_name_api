@@ -4,7 +4,6 @@ defmodule PopularNameApi.PeopleGenerator.DaneGovApiTest do
   alias PopularNameApi.PeopleGenerator.DaneGovApi
 
   describe "male_surnames_path/1" do
-
     test "returns proper url" do
       random_amount = :rand.uniform(2000)
       url = DaneGovApi.male_surnames_path(random_amount)
@@ -14,7 +13,6 @@ defmodule PopularNameApi.PeopleGenerator.DaneGovApiTest do
   end
 
   describe "male_lastnames_path/1" do
-
     test "returns proper url" do
       random_amount = :rand.uniform(2000)
       url = DaneGovApi.male_lastnames_path(random_amount)
@@ -24,7 +22,6 @@ defmodule PopularNameApi.PeopleGenerator.DaneGovApiTest do
   end
 
   describe "female_surnames_path/1" do
-
     test "returns proper url" do
       random_amount = :rand.uniform(2000)
       url = DaneGovApi.female_surnames_path(random_amount)
@@ -34,7 +31,6 @@ defmodule PopularNameApi.PeopleGenerator.DaneGovApiTest do
   end
 
   describe "female_lastnames_path/1" do
-
     test "returns proper url" do
       random_amount = :rand.uniform(2000)
       url = DaneGovApi.female_lastnames_path(random_amount)

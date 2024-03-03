@@ -12,7 +12,11 @@ defmodule PopularNameApiWeb.Schemas.Person do
       first_name: %Schema{type: :string, description: "Persons first name"},
       last_name: %Schema{type: :string, description: "Persons last name"},
       birth_date: %Schema{type: :string, description: "Persons birth date", format: :date},
-      sex: %Schema{type: :string, description: "Persons gender. One of 'male', 'female'", pattern: ~r/(male)|(female)/},
+      sex: %Schema{
+        type: :string,
+        description: "Persons gender. One of 'male', 'female'",
+        pattern: ~r/(male)|(female)/
+      },
       updated_at: %Schema{type: :string, description: "Update timestamp"},
       inserted_at: %Schema{type: :string, description: "Creation timestamp"}
     },

@@ -7,7 +7,7 @@ defmodule PopularNameApi.PeopleGenerator do
 
   @default_amount 100
   @default_generate_from_amount 100
-  @last_possible_birth 1704067199
+  @last_possible_birth 1_704_067_199
 
   def async_generation(amount \\ @default_amount) do
     Task.start(fn -> generate_people(amount) end)
@@ -42,7 +42,9 @@ defmodule PopularNameApi.PeopleGenerator do
         :ok
 
       {inserted, _} ->
-        Logger.debug("Some conflicts occurred during insertion. Generated only #{inserted} instead of #{amount} people.")
+        Logger.debug(
+          "Some conflicts occurred during insertion. Generated only #{inserted} instead of #{amount} people."
+        )
 
         ensure_valid_amount_is_inserted(generator, amount - inserted)
     end
@@ -126,6 +128,6 @@ defmodule PopularNameApi.PeopleGenerator do
     |> Jason.decode!()
     |> Map.fetch!("data")
     |> Stream.map(& &1["attributes"]["col1"]["val"])
-    |> Enum.map(& String.capitalize/1)
+    |> Enum.map(&String.capitalize/1)
   end
 end
