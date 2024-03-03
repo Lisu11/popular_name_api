@@ -59,7 +59,8 @@ defmodule PopularNameApi.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
       {:ex_machina, "~> 2.7.0", only: :test},
-      {:httpoison, "~> 2.0"}
+      {:httpoison, "~> 2.0"},
+      {:open_api_spex, "~> 3.18"}
     ]
   end
 

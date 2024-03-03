@@ -9,17 +9,16 @@ defmodule PopularNameApi.PeopleGenerator do
   @default_generate_from_amount 100
   @last_possible_birth 1704067199
 
-  def generate_males_async do
-    return_pid = self()
-    send(return_pid, nil)
+  def async_generation(amount \\ @default_amount) do
+    Task.start(fn -> generate_people(amount) end)
   end
 
-  def generate_people do
+  def generate_people(amount \\ @default_amount) do
     task_first_male_names = Task.async(fn -> fetch_most_common_male_first_names() end)
     task_last_male_names = Task.async(fn -> fetch_most_common_male_last_names() end)
     task_first_female_names = Task.async(fn -> fetch_most_common_female_first_names() end)
     task_last_female_names = Task.async(fn -> fetch_most_common_female_last_names() end)
-    births = Enum.map(1..@default_amount, fn _ -> generate_random_birth_date() end)
+    births = Enum.map(1..amount, fn _ -> generate_random_birth_date() end)
 
     [male_fns, male_lns, female_fns, female_lns] =
       Task.await_many([
@@ -31,7 +30,7 @@ defmodule PopularNameApi.PeopleGenerator do
 
     ensure_valid_amount_is_inserted(
       &generate_random_people(male_fns, male_lns, female_fns, female_lns, births, &1),
-      @default_amount
+      amount
     )
   end
 
@@ -126,6 +125,7 @@ defmodule PopularNameApi.PeopleGenerator do
     data
     |> Jason.decode!()
     |> Map.fetch!("data")
-    |> Enum.map(& &1["attributes"]["col1"]["val"])
+    |> Stream.map(& &1["attributes"]["col1"]["val"])
+    |> Enum.map(& String.capitalize/1)
   end
 end

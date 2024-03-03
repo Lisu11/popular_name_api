@@ -29,11 +29,26 @@ defmodule PopularNameApi.Citizens.Person do
     changeset
     |> validate_change(:birth_date, fn
       :birth_date, %Date{} = date ->
-        case {Date.compare(date, ~D[1969-12-31]), Date.compare(date, ~D[2024-01-01])} do
-          {:gt, :lt} -> []
-          _ -> [birth_date: "Birth date must be between 1970-01-01 and 2023-12-31"]
+        check_if_date_between(date)
+
+      :birth_date, date when is_binary(date) ->
+        case Date.from_iso8601(date) do
+          {:ok, date} ->
+            check_if_date_between(date)
+
+          _ ->
+            [birth_date: "Birth date must be %Date{} struct or binary in iso8601 format"]
         end
-      :birth_date, _ -> [birth_date: "Birth date must be %Date{} struct"]
+
+      :birth_date, _date ->
+        [birth_date: "Birth date must be %Date{} struct or binary in iso8601 format"]
     end)
+  end
+
+  defp check_if_date_between(%Date{} = date) do
+    case {Date.compare(date, ~D[1969-12-31]), Date.compare(date, ~D[2024-01-01])} do
+      {:gt, :lt} -> []
+      _ -> [birth_date: "Birth date must be between 1970-01-01 and 2023-12-31"]
+    end
   end
 end

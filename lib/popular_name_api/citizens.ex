@@ -24,18 +24,16 @@ defmodule PopularNameApi.Citizens do
   @doc """
   Gets a single person.
 
-  Raises `Ecto.NoResultsError` if the Person does not exist.
-
   ## Examples
 
       iex> get_person!(123)
       %Person{}
 
       iex> get_person!(456)
-      ** (Ecto.NoResultsError)
+      nil
 
   """
-  def get_person!(id), do: Repo.get!(Person, id)
+  def get_person(id), do: Repo.get(Person, id)
 
   @doc """
   Creates a person.

@@ -17,7 +17,7 @@ defmodule PopularNameApi.CitizensTest do
 
     test "get_person!/1 returns the person with given id" do
       person = insert(:person)
-      assert Citizens.get_person!(person.id) == person
+      assert Citizens.get_person(person.id) == person
     end
 
     test "create_person/1 with valid data creates a person" do
@@ -56,25 +56,25 @@ defmodule PopularNameApi.CitizensTest do
     test "update_person/2 with invalid name returns error changeset" do
       person = insert(:person)
       assert {:error, %Ecto.Changeset{}} = Citizens.update_person(person, @invalid_attrs_name)
-      assert person == Citizens.get_person!(person.id)
+      assert person == Citizens.get_person(person.id)
     end
 
     test "update_person/2 with invalid sex returns error changeset" do
       person = insert(:person)
       assert {:error, %Ecto.Changeset{}} = Citizens.update_person(person, @invalid_attrs_sex)
-      assert person == Citizens.get_person!(person.id)
+      assert person == Citizens.get_person(person.id)
     end
 
     test "update_person/2 with invalid birth returns error changeset" do
       person = insert(:person)
       assert {:error, %Ecto.Changeset{}} = Citizens.update_person(person, @invalid_attrs_birth)
-      assert person == Citizens.get_person!(person.id)
+      assert person == Citizens.get_person(person.id)
     end
 
     test "delete_person/1 deletes the person" do
       person = insert(:person)
       assert {:ok, %Person{}} = Citizens.delete_person(person)
-      assert_raise Ecto.NoResultsError, fn -> Citizens.get_person!(person.id) end
+      assert is_nil(Citizens.get_person(person.id))
     end
 
     test "change_person/1 returns a person changeset" do

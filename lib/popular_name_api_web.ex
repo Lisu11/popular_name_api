@@ -44,6 +44,7 @@ defmodule PopularNameApiWeb do
 
       import Plug.Conn
       import PopularNameApiWeb.Gettext
+      use OpenApiSpex.ControllerSpecs
 
       unquote(verified_routes())
     end

@@ -22,6 +22,20 @@ defmodule PopularNameApiWeb.PersonControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
+  describe "generate" do
+    alias PopularNameApi.Citizens
+
+    test "generate some persons", %{conn: conn} do
+      assert Citizens.list_persons() == []
+
+      conn = post(conn, ~p"/api/generate")
+      assert response(conn, 204)
+      :timer.sleep(1500)
+
+      assert Enum.count(Citizens.list_persons()) == 100
+    end
+  end
+
   describe "index" do
     test "lists all persons", %{conn: conn} do
       conn = get(conn, ~p"/api/persons")
@@ -31,7 +45,7 @@ defmodule PopularNameApiWeb.PersonControllerTest do
 
   describe "create person" do
     test "renders person when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/persons", person: @create_attrs)
+      conn = post(conn, ~p"/api/persons", Map.to_list(@create_attrs))
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, ~p"/api/persons/#{id}")
@@ -46,7 +60,7 @@ defmodule PopularNameApiWeb.PersonControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/api/persons", person: @invalid_attrs)
+      conn = post(conn, ~p"/api/persons", Map.to_list(@invalid_attrs))
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -55,7 +69,7 @@ defmodule PopularNameApiWeb.PersonControllerTest do
     setup [:create_person]
 
     test "renders person when data is valid", %{conn: conn, person: %Person{id: id} = person} do
-      conn = put(conn, ~p"/api/persons/#{person}", person: @update_attrs)
+      conn = put(conn, ~p"/api/persons/#{person}", Map.to_list(@update_attrs))
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, ~p"/api/persons/#{id}")
@@ -70,8 +84,54 @@ defmodule PopularNameApiWeb.PersonControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, person: person} do
-      conn = put(conn, ~p"/api/persons/#{person}", person: @invalid_attrs)
+      conn = put(conn, ~p"/api/persons/#{person.id}", Map.to_list(@invalid_attrs))
       assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "bad request should be return for invalid id", %{conn: conn} do
+      conn = put(conn, ~p"/api/persons/abc", Map.to_list(@update_attrs))
+      assert response(conn, 400)
+      assert json_response(conn, 400)["error_details"] =~ "Bad Request"
+    end
+
+    test "not found should be return for unknown id", %{conn: conn, person: person} do
+      conn = get(conn, ~p"/api/persons")
+      assert json_response(conn, 200)["data"]
+      [p] = json_response(conn, 200)["data"]
+      assert p["id"] == person.id
+
+      conn = put(conn, ~p"/api/persons/#{person.id + 1}", Map.to_list(@update_attrs))
+      assert json_response(conn, 404)["error_details"] =~ "Not Found"
+    end
+  end
+
+  describe "show person" do
+    setup [:create_person]
+
+    test "shows chosen person", %{conn: conn, person: person} do
+      conn = get(conn, ~p"/api/persons/#{person.id}")
+      assert response(conn, 200)
+      p = json_response(conn, 200)["data"]
+
+      assert p["id"] == person.id
+      assert p["first_name"] == person.first_name
+      assert p["last_name"] == person.last_name
+    end
+
+    test "bad request should be return for invalid id", %{conn: conn} do
+      conn = get(conn, ~p"/api/persons/abc")
+      assert response(conn, 400)
+      assert json_response(conn, 400)["error_details"] =~ "Bad Request"
+    end
+
+     test "not found should be return for unknown id", %{conn: conn, person: person} do
+      conn = get(conn, ~p"/api/persons")
+      assert json_response(conn, 200)["data"]
+      [p] = json_response(conn, 200)["data"]
+      assert p["id"] == person.id
+
+      conn = get(conn, ~p"/api/persons/#{person.id + 1}")
+      assert json_response(conn, 404)["error_details"] =~ "Not Found"
     end
   end
 
@@ -79,12 +139,28 @@ defmodule PopularNameApiWeb.PersonControllerTest do
     setup [:create_person]
 
     test "deletes chosen person", %{conn: conn, person: person} do
-      conn = delete(conn, ~p"/api/persons/#{person}")
+      conn = delete(conn, ~p"/api/persons/#{person.id}")
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
-        get(conn, ~p"/api/persons/#{person}")
-      end
+      conn = get(conn, ~p"/api/persons/#{person.id}")
+      assert response(conn, 404)
+    end
+
+    test "bad request should be return for invalid id", %{conn: conn} do
+      conn = delete(conn, ~p"/api/persons/abc")
+      assert response(conn, 400)
+      assert json_response(conn, 400)["error_details"] =~ "Bad Request"
+    end
+
+
+    test "not found should be return for unknown id", %{conn: conn, person: person} do
+      conn = get(conn, ~p"/api/persons")
+      assert json_response(conn, 200)["data"]
+      [p] = json_response(conn, 200)["data"]
+      assert p["id"] == person.id
+
+      conn = delete(conn, ~p"/api/persons/#{person.id + 1}")
+      assert json_response(conn, 404)["error_details"] =~ "Not Found"
     end
   end
 

@@ -12,19 +12,27 @@ defmodule PopularNameApiWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug OpenApiSpex.Plug.PutApiSpec, module: PopularNameApiWeb.ApiSpec
   end
 
-  scope "/", PopularNameApiWeb do
+  scope "/" do
     pipe_through :browser
 
-    get "/", PageController, :home
-
+    get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
   end
 
   # Other scopes may use custom stacks.
   scope "/api", PopularNameApiWeb do
     pipe_through :api
+
+    post "/generate", PersonController, :generate
     resources "/persons", PersonController, except: [:new, :edit]
+  end
+
+  scope "/api" do
+    pipe_through :api
+
+    get "/openapi", OpenApiSpex.Plug.RenderSpec, []
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
