@@ -6,6 +6,7 @@ defmodule PopularNameApiWeb.PersonController do
 
   alias PopularNameApiWeb.Schemas.{
     PeopleResponse,
+    FilterParams,
     PersonParams,
     PersonResponse,
     ErrorObjectResponse,
@@ -37,14 +38,55 @@ defmodule PopularNameApiWeb.PersonController do
 
   operation :index,
     summary: "List generated people",
-    parameters: [],
-    responses: [
-      ok: {"People response", "application/json", PeopleResponse}
-    ]
+    parameters: [
+      filter: [in: :query, type: FilterParams],
+      sort: [in: :query, type: :string, description: "Example: asc(first_name),desc(birth_date)"]
+    ],
+    responses: %{
+      :ok => {"People response", "application/json", PeopleResponse},
+      400 => {"Wrong input data", "application/json", ErrorStringResponse}
+    }
 
-  def index(conn, _params) do
-    persons = Citizens.list_persons()
+  def index(conn, %{"sort" => sorters} = params) do
+    with true <- validate_sorters(sorters),
+         parsed_sorters <- parse_sorters(sorters) do
+      persons = Citizens.list_filtered_persons(params, parsed_sorters)
+      render(conn, :index, persons: persons)
+    end
+  end
+
+  def index(conn, params) do
+    persons = Citizens.list_filtered_persons(params, [])
     render(conn, :index, persons: persons)
+  end
+
+  defp validate_sorters(sorters) do
+    sorters
+    |> String.split(",")
+    |> Enum.all?(fn col ->
+      col =~
+        ~r/(asc\((first_name)|(last_name)|(birth_date)|(sex)\))|(desc\((first_name)|(last_name)|(birth_date)|(sex)\))/
+    end)
+    |> case do
+      false -> {:error, :bad_request}
+      true -> true
+    end
+  end
+
+  defp parse_sorters(sorters) do
+    sorters
+    |> String.split(",")
+    |> Enum.map(fn
+      "asc(" <> field ->
+        field
+        |> String.trim_trailing(")")
+        |> then(&{String.to_existing_atom(&1), :asc})
+
+      "desc(" <> field ->
+        field
+        |> String.trim_trailing(")")
+        |> then(&{String.to_existing_atom(&1), :desc})
+    end)
   end
 
   operation :create,

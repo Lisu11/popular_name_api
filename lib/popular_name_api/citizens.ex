@@ -6,6 +6,7 @@ defmodule PopularNameApi.Citizens do
   import Ecto.Query, warn: false
   alias PopularNameApi.Repo
 
+  alias PopularNameApi.Citizens.PersonQueries
   alias PopularNameApi.Citizens.Person
 
   @doc """
@@ -19,6 +20,26 @@ defmodule PopularNameApi.Citizens do
   """
   def list_persons do
     Repo.all(Person)
+  end
+
+  @doc """
+  Returns the list of persons filtered by some params.
+
+  ## Examples
+
+      iex> list_filtered_persons([], [])
+      [%Person{}, ...]
+
+  """
+  def list_filtered_persons(filters, sorters) do
+    Person
+    |> PersonQueries.maybe_filter_by_first_name(filters)
+    |> PersonQueries.maybe_filter_by_last_name(filters)
+    |> PersonQueries.maybe_filter_by_sex(filters)
+    |> PersonQueries.maybe_filter_by_birth_from(filters)
+    |> PersonQueries.maybe_filter_by_birth_to(filters)
+    |> PersonQueries.maybe_sort_by(sorters)
+    |> Repo.all()
   end
 
   @doc """

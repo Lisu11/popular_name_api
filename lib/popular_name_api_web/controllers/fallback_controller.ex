@@ -22,6 +22,13 @@ defmodule PopularNameApiWeb.FallbackController do
     |> render(:"404")
   end
 
+  def call(conn, {:error, :unprocessable_entity}) do
+    conn
+    |> put_status(:bad_request)
+    |> put_view(html: PopularNameApiWeb.ErrorHTML, json: PopularNameApiWeb.ErrorJSON)
+    |> render(:"422")
+  end
+
   def call(conn, {:error, :bad_request}) do
     conn
     |> put_status(:bad_request)

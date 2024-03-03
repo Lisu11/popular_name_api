@@ -36,9 +36,68 @@ defmodule PopularNameApiWeb.PersonControllerTest do
   end
 
   describe "index" do
-    test "lists all persons", %{conn: conn} do
+    test "that lists all persons rerurns empty list", %{conn: conn} do
       conn = get(conn, ~p"/api/persons")
       assert json_response(conn, 200)["data"] == []
+    end
+
+    test "that lists all persons returns non empty list", %{conn: conn} do
+      insert_list(10, :person)
+      conn = get(conn, ~p"/api/persons")
+      assert response(conn, 200)
+      assert Enum.count(json_response(conn, 200)["data"]) == 10
+    end
+
+    test "that lists all persons allows filtering by birth date", %{conn: conn} do
+      insert_list(10, :person)
+
+      conn =
+        get(conn, ~p"/api/persons",
+          birth_date_from: ~D[1970-01-05],
+          birth_date_to: ~D[1970-01-08]
+        )
+
+      assert response(conn, 200)
+      assert Enum.count(json_response(conn, 200)["data"]) == 4
+    end
+
+    test "that lists all persons allows filtering by sex", %{conn: conn} do
+      insert_list(10, :person)
+      insert_list(10, :person, %{sex: :male})
+
+      conn = get(conn, ~p"/api/persons", sex: :male)
+      assert response(conn, 200)
+      assert Enum.count(json_response(conn, 200)["data"]) == 10
+    end
+
+    test "that lists all persons allows filtering by first_name", %{conn: conn} do
+      insert_list(10, :person)
+      insert_list(10, :person, %{first_name: "John", sex: :male})
+
+      conn = get(conn, ~p"/api/persons", first_name: "John")
+      assert response(conn, 200)
+      assert Enum.count(json_response(conn, 200)["data"]) == 10
+    end
+
+    test "that lists all persons allows sorting by first_name ascending and last_name descending",
+         %{conn: conn} do
+      insert(:person, %{first_name: "John", sex: :male})
+      insert(:person, %{first_name: "John", last_name: "Anderson", sex: :male})
+      insert(:person, %{first_name: "Jacob", sex: :male})
+      insert(:person, %{first_name: "Abraham", sex: :male})
+
+      conn = get(conn, ~p"/api/persons", sort: "asc(first_name),desc(last_name)")
+      assert response(conn, 200)
+
+      result =
+        json_response(conn, 200)["data"] |> Enum.map(&Map.take(&1, ["first_name", "last_name"]))
+
+      assert result == [
+               %{"first_name" => "Abraham", "last_name" => "Smith"},
+               %{"first_name" => "Jacob", "last_name" => "Smith"},
+               %{"first_name" => "John", "last_name" => "Smith"},
+               %{"first_name" => "John", "last_name" => "Anderson"}
+             ]
     end
   end
 
