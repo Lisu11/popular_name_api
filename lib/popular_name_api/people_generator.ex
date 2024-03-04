@@ -10,7 +10,15 @@ defmodule PopularNameApi.PeopleGenerator do
   @last_possible_birth 1_704_067_199
 
   def async_generation(amount \\ @default_amount) do
-    Task.start(fn -> generate_people(amount) end)
+    # Task.start(fn -> generate_people(amount) end)
+
+    Task.Supervisor.start_child(
+      PopularNameApi.TaskSupervisor,
+      fn ->
+        generate_people(amount)
+      end,
+      restart: :transient
+    )
   end
 
   def generate_people(amount \\ @default_amount) do
@@ -119,7 +127,7 @@ defmodule PopularNameApi.PeopleGenerator do
       response ->
         Logger.error("Unable to fetch names error #{inspect(response)}")
 
-        {:error, "Unable to fetch names from dane.gov.pl. Check logs"}
+        raise "Unable to fetch names from dane.gov.pl. Check logs"
     end
   end
 

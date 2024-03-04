@@ -14,6 +14,7 @@ defmodule PopularNameApi.Application do
       {Phoenix.PubSub, name: PopularNameApi.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: PopularNameApi.Finch},
+      {Task.Supervisor, name: PopularNameApi.TaskSupervisor, max_restarts: 5},
       # Start a worker by calling: PopularNameApi.Worker.start_link(arg)
       # {PopularNameApi.Worker, arg},
       # Start to serve requests, typically the last entry

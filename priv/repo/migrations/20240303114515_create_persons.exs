@@ -11,6 +11,6 @@ defmodule PopularNameApi.Repo.Migrations.CreatePersons do
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:persons, [:last_name, :first_name, :sex, :birth_date])
+    create unique_index(:persons, [:last_name, :first_name, :birth_date])
   end
 end

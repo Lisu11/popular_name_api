@@ -135,7 +135,7 @@ defmodule PopularNameApi.Citizens do
       Person,
       attrs_list,
       on_conflict: :nothing,
-      conflict_target: [:last_name, :first_name, :sex, :birth_date]
+      conflict_target: [:last_name, :first_name, :birth_date]
     )
   end
 end

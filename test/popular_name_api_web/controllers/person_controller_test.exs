@@ -36,6 +36,8 @@ defmodule PopularNameApiWeb.PersonControllerTest do
   end
 
   describe "index" do
+    alias PopularNameApi.Citizens
+
     test "that lists all persons rerurns empty list", %{conn: conn} do
       conn = get(conn, ~p"/api/persons")
       assert json_response(conn, 200)["data"] == []
@@ -49,12 +51,13 @@ defmodule PopularNameApiWeb.PersonControllerTest do
     end
 
     test "that lists all persons allows filtering by birth date", %{conn: conn} do
-      insert_list(10, :person)
+      [p | _] = insert_list(10, :person)
+      assert Enum.count(Citizens.list_persons()) == 10
 
       conn =
         get(conn, ~p"/api/persons",
-          birth_date_from: ~D[1970-01-05],
-          birth_date_to: ~D[1970-01-08]
+          birth_date_from: Date.add(p.birth_date, 5),
+          birth_date_to: Date.add(p.birth_date, 8)
         )
 
       assert response(conn, 200)
