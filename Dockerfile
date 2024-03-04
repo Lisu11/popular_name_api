@@ -1,19 +1,25 @@
-# Extend from the official Elixir image.
 FROM elixir:latest
 
+# Install debian packages
 RUN apt-get update && \
-  apt-get install -y postgresql-client
+    apt-get install --yes build-essential inotify-tools postgresql-client git && \
+    apt-get clean
 
-# Create app directory and copy the Elixir projects into it.
-RUN mkdir /app
-COPY . /app
+ADD . /app
+
+# Install Phoenix packages
+RUN mix local.hex --force && \
+    mix local.rebar --force && \
+    mix archive.install --force hex phx_new 1.5.1
+
+# Install node
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && apt-get install -y nodejs
+
 WORKDIR /app
 
-# Install Hex package manager.
-# By using `--force`, we don’t need to type “Y” to confirm the installation.
-RUN mix local.hex --force
+RUN mix deps.get
+RUN npm install --prefix ./assets
 
-# Compile the project.
-RUN mix do compile
+EXPOSE 4000
 
 CMD ["/app/entrypoint.sh"]
