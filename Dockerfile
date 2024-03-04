@@ -13,12 +13,13 @@ RUN mix local.hex --force && \
     mix archive.install --force hex phx_new 1.5.1
 
 # Install node
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && apt-get install -y nodejs
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
 
 WORKDIR /app
 
 RUN mix deps.get
-RUN npm install --prefix ./assets
+RUN mix compile
+# RUN npm install --prefix ./assets
 
 EXPOSE 4000
 
