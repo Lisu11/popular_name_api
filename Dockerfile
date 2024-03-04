@@ -12,8 +12,6 @@ RUN mix local.hex --force && \
     mix local.rebar --force && \
     mix archive.install --force hex phx_new 1.5.1
 
-# Install node
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
 
 WORKDIR /app
 

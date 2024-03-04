@@ -18,7 +18,7 @@ defmodule PopularNameApiWeb.Router do
   scope "/" do
     pipe_through :browser
 
-    get "/", PopularNameApiWeb.PageController, :home
+    # get "/", PopularNameApiWeb.PageController, :home
     get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
   end
 
